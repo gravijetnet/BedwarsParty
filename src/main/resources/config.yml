@@ -1,0 +1,17 @@
+# =========================================================================
+#  BedwarsParty  -  example.invalid
+#  Party system integrated with MBedwars.
+#  Messages can be edited in messages.yml.
+# =========================================================================
+
+settings:
+  # How long (in seconds) a party invite stays valid before it expires.
+  invite-expiry-seconds: 60
+
+  # Maximum amount of players allowed in a single party (the leader counts).
+  # Set to 0 for no limit.
+  max-party-size: 8
+
+  # Format used for party chat messages.
+  # Placeholders: %player% (sender name), %message% (the chat message).
+  party-chat-format: "&cParty Chat &8»&r &f%player%&8: &r%message%"

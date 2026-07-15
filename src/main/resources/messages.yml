@@ -1,0 +1,126 @@
+# =========================================================================
+#  BedwarsParty  -  Messages
+#  Colour codes use '&'. %prefix% is replaced by the "prefix" value below.
+#  Available placeholders are noted per message.
+# =========================================================================
+
+prefix: "&cParty &8»&r "
+
+# ---- General ----
+no-permission: "%prefix%&fYou don't have permission to do that."
+player-only: "%prefix%&fOnly players can use this command."
+not-in-party: "%prefix%&fYou are not in a party."
+already-in-party: "%prefix%&fYou are already in a party."
+not-leader: "%prefix%&fOnly the party leader can do that."
+not-leader-or-mod: "%prefix%&fOnly the party leader or a moderator can do that."
+cannot-target-self: "%prefix%&fYou cannot target yourself."
+# %name%
+player-not-found: "%prefix%&c%name% &fis not online."
+unknown-command: "%prefix%&fUnknown subcommand. Type &c/party help&f."
+# %usage%
+usage: "%prefix%&fUsage: &c%usage%"
+
+# ---- Invite ----
+party-created: "%prefix%&fYou created a new party."
+# %name%
+invite-sent: "%prefix%&fYou invited &c%name% &fto your party."
+# %inviter% %seconds%
+invite-received: "%prefix%&c%inviter% &fhas invited you to their party. Type &c/party accept %inviter% &fwithin &c%seconds%s&f to join."
+# %name%
+invite-already-sent: "%prefix%&c%name% &falready has a pending invite."
+# %name%
+invite-target-in-party: "%prefix%&c%name% &fis already in a party."
+# %name%
+invite-target-in-your-party: "%prefix%&c%name% &fis already in your party."
+# %max%
+party-full: "%prefix%&fThe party is full (&c%max%&f)."
+# %name%  (shown to the inviter)
+invite-expired-inviter: "%prefix%&fYour party invite to &c%name% &fhas expired."
+# %name%  (shown to the invited player, name = leader)
+invite-expired-target: "%prefix%&fThe party invite from &c%name% &fhas expired."
+
+# ---- Accept / Deny ----
+no-invites: "%prefix%&fYou don't have any pending party invites."
+# %name%
+no-such-invite: "%prefix%&fYou don't have a pending invite from &c%name%&f."
+multiple-invites: "%prefix%&fYou have several invites. Use &c/party accept <player>&f."
+invite-no-longer-valid: "%prefix%&fThat party no longer exists."
+# %name%  (name = leader)
+joined-party: "%prefix%&fYou joined &c%name%&f's party."
+# %name%  (broadcast to the party)
+member-joined: "%prefix%&c%name% &fjoined the party."
+# %name%  (name = leader)
+denied: "%prefix%&fYou denied the party invite from &c%name%&f."
+# %name%  (shown to the inviter)
+denied-notify: "%prefix%&c%name% &fdenied your party invite."
+
+# ---- Leave / Kick / Disband ----
+left-party: "%prefix%&fYou left the party."
+# %name%
+member-left: "%prefix%&c%name% &fleft the party."
+# %name%
+member-disconnected: "%prefix%&c%name% &fdisconnected and left the party."
+kicked: "%prefix%&fYou have been removed from the party."
+# %name%
+member-kicked: "%prefix%&c%name% &fwas removed from the party."
+cannot-kick-self: "%prefix%&fYou cannot kick yourself. Use &c/party leave&f."
+cannot-kick-leader: "%prefix%&fYou cannot kick the party leader."
+# %name%
+not-in-your-party: "%prefix%&c%name% &fis not in your party."
+disbanded: "%prefix%&fThe party has been disbanded."
+# %name%  (broadcast, name = new leader)
+leader-transferred: "%prefix%&fLeadership has been transferred to &c%name%&f."
+new-leader-you: "%prefix%&fYou are now the party leader."
+
+# ---- Promote / Demote / Transfer ----
+# %name%
+promoted: "%prefix%&c%name% &fis now a party moderator."
+# %name%
+demoted: "%prefix%&c%name% &fis no longer a party moderator."
+# %name%
+already-moderator: "%prefix%&c%name% &fis already a moderator."
+# %name%
+not-moderator: "%prefix%&c%name% &fis not a moderator."
+cannot-promote-leader: "%prefix%&fYou cannot change the leader's rank."
+transfer-self: "%prefix%&fYou are already the party leader."
+
+# ---- Warp ----
+warp-done: "%prefix%&fYou warped your party to your location."
+warped: "%prefix%&fYou were warped to the party leader."
+warp-no-targets: "%prefix%&fThere is nobody to warp."
+
+# ---- List ----
+# %count%
+list-header: "&8&m--------------&r &cParty &7(&f%count% members&7) &8&m--------------"
+# %name%
+list-leader: "&cLeader &8» &f%name%"
+# %names%
+list-moderators: "&cModerators &8» &f%names%"
+# %names%
+list-members: "&cMembers &8» &f%names%"
+list-none: "&7None"
+list-footer: "&8&m-------------------------------------------------"
+
+# ---- Party Chat ----
+chat-enabled: "%prefix%&fParty chat &cenabled&f. Your messages now go to your party."
+chat-disabled: "%prefix%&fParty chat &cdisabled&f."
+
+# ---- Admin ----
+reloaded: "%prefix%&fConfiguration reloaded."
+
+# ---- Help (list of lines) ----
+help:
+  - "&8&m--------------&r &cParty Commands &8&m--------------"
+  - "&c/party invite <player> &8» &fInvite a player to your party"
+  - "&c/party accept <player> &8» &fAccept a party invite"
+  - "&c/party deny <player> &8» &fDeny a party invite"
+  - "&c/party leave &8» &fLeave your current party"
+  - "&c/party kick <player> &8» &fRemove a member from the party"
+  - "&c/party promote <player> &8» &fPromote a member to moderator"
+  - "&c/party demote <player> &8» &fDemote a moderator"
+  - "&c/party transfer <player> &8» &fTransfer the leadership"
+  - "&c/party warp &8» &fTeleport your party to you"
+  - "&c/party list &8» &fShow all party members"
+  - "&c/party disband &8» &fDisband your party"
+  - "&c/partychat [message] &8» &fParty chat, or toggle it"
+  - "&8&m-------------------------------------------------"

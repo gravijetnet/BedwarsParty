@@ -1,0 +1,25 @@
+name: BedwarsParty
+version: ${project.version}
+main: net.gravijet.bedwarsparty.BedwarsPartyPlugin
+author: GraviJet
+description: Party system for example.invalid, integrated with MBedwars.
+website: https://example.invalid
+depend: [MBedwars]
+
+commands:
+  party:
+    description: Create and manage your party.
+    usage: /party help
+    aliases: [p, pa]
+  partychat:
+    description: Send a message to your party or toggle party chat.
+    usage: /partychat [message]
+    aliases: [pc, pchat]
+
+permissions:
+  bedwarsparty.use:
+    description: Allows the usage of the party system.
+    default: true
+  bedwarsparty.admin:
+    description: Allows administrative actions such as reloading the configuration.
+    default: op
