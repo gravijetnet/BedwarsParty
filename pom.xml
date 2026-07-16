@@ -43,6 +43,19 @@
             <artifactId>spigot-api</artifactId>
             <version>${spigot.version}</version>
             <scope>provided</scope>
+            <!--
+                spigot-api 1.8.8 pulls in net.md-5:bungeecord-chat:1.8-SNAPSHOT
+                transitively. That old snapshot has been purged from the Spigot
+                and Sonatype repos, so it no longer resolves in CI. The plugin
+                does not use any net.md_5.bungee.* chat-component classes, and the
+                server provides them at runtime anyway, so we exclude it.
+            -->
+            <exclusions>
+                <exclusion>
+                    <groupId>net.md-5</groupId>
+                    <artifactId>bungeecord-chat</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- MBedwars API. Provided at runtime by the MBedwars plugin. -->
