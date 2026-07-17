@@ -52,7 +52,12 @@ public class MBedwarsPartyHook implements PartiesHook {
     @Override
     public void getMember(UUID playerUUID, Consumer<Optional<PartiesHook.Member>> callback) {
         net.gravijet.bedwarsparty.party.Party party = plugin.getPartyManager().getParty(playerUUID);
-        if (party == null || party.size() < 2) {
+        // Everything that reads this hook (MBedwars itself, the Private Games
+        // addon, ...) treats an empty Optional as "this player has no party".
+        // Reporting solo parties as empty therefore makes Private Games claim
+        // the leader is party-less, so it is only done when configured.
+        int minimum = plugin.getPartyManager().isReportSoloParties() ? 1 : 2;
+        if (party == null || party.size() < minimum) {
             callback.accept(Optional.empty());
             return;
         }

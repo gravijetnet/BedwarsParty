@@ -12,6 +12,22 @@ settings:
   # Set to 0 for no limit.
   max-party-size: 8
 
+  # How long (in seconds) a member that disconnects keeps their spot in the
+  # party before they are removed automatically. This is what Hypixel does:
+  # a short disconnect does not cost you your party.
+  # Set to 0 to remove members the moment they disconnect.
+  offline-grace-seconds: 300
+
+  # Stop players from entering a Bedwars arena while somebody in their party
+  # is still offline. Prevents starting a game that a member cannot join.
+  block-arena-join-with-offline-members: true
+
+  # Report parties that only have one member to MBedwars.
+  # Keep this enabled: addons such as PrivateGamesAddon ask this plugin whether
+  # a player has a party, and treat "no party" as "you may not create/join a
+  # private game". With this disabled a one-man party is reported as no party.
+  report-solo-parties: true
+
   # Format used for party chat messages.
   # Placeholders: %player% (sender name), %message% (the chat message).
   party-chat-format: "&cParty Chat &8»&r &f%player%&8: &r%message%"

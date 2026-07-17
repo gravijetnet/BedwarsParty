@@ -32,9 +32,19 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        Party party = manager.getParty(player.getUniqueId());
-        if (party != null) {
-            party.updateName(player.getUniqueId(), player.getName());
+        UUID uuid = player.getUniqueId();
+
+        Party party = manager.getParty(uuid);
+        if (party == null) {
+            return;
+        }
+        party.updateName(uuid, player.getName());
+
+        // Reconnected inside the grace period: give the spot back.
+        if (party.isOffline(uuid)) {
+            manager.markOnline(uuid);
+            Messages.broadcastExcept(party, uuid, "member-reconnected", "name", player.getName());
+            Messages.send(player, "rejoined-party", "name", party.getName(party.getLeader()));
         }
     }
 
@@ -46,19 +56,35 @@ public class PlayerListener implements Listener {
         manager.setPartyChatToggled(uuid, false);
         manager.clearInvitesFor(uuid);
 
-        if (manager.getParty(uuid) == null) {
+        Party party = manager.getParty(uuid);
+        if (party == null) {
             return;
         }
-        PartyManager.LeaveResult result = manager.leave(uuid);
+
+        long grace = manager.getOfflineGraceMillis();
+        if (grace <= 0) {
+            // Timeout disabled: fall back to dropping the player right away.
+            PartyManager.LeaveResult result = manager.leave(uuid);
+            announceInstantRemoval(result, player.getName());
+            return;
+        }
+
+        // Keep the spot and let the timeout task deal with them later.
+        manager.markOffline(uuid);
+        Messages.broadcastExcept(party, uuid, "member-disconnected",
+                "name", player.getName(), "minutes", formatMinutes(grace));
+    }
+
+    private void announceInstantRemoval(PartyManager.LeaveResult result, String playerName) {
         if (result.party == null) {
             return;
         }
         switch (result.outcome) {
             case LEFT:
-                Messages.broadcast(result.party, "member-disconnected", "name", player.getName());
+                Messages.broadcast(result.party, "member-offline-removed", "name", playerName);
                 break;
             case TRANSFERRED:
-                Messages.broadcast(result.party, "member-disconnected", "name", player.getName());
+                Messages.broadcast(result.party, "member-offline-removed", "name", playerName);
                 Messages.broadcast(result.party, "leader-transferred",
                         "name", result.party.getName(result.newLeader));
                 Player newLeader = Bukkit.getPlayer(result.newLeader);
@@ -70,6 +96,15 @@ public class PlayerListener implements Listener {
             default:
                 break;
         }
+    }
+
+    /** Renders the grace period the way Hypixel words it, e.g. "5" or "1.5". */
+    private String formatMinutes(long millis) {
+        long seconds = millis / 1000L;
+        if (seconds % 60 == 0) {
+            return String.valueOf(seconds / 60);
+        }
+        return String.valueOf(Math.round(seconds / 6.0) / 10.0);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)

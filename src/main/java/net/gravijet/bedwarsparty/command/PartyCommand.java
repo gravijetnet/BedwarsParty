@@ -22,12 +22,16 @@ import java.util.UUID;
 
 /**
  * Handles {@code /party} and all of its subcommands, plus tab completion.
+ *
+ * <p>Anything that is not a known subcommand is treated as a player name, so
+ * {@code /p Notch} invites Notch just like it does on Hypixel.</p>
  */
 public class PartyCommand implements CommandExecutor, TabCompleter {
 
     private static final List<String> SUBCOMMANDS = Arrays.asList(
-            "invite", "accept", "deny", "leave", "kick", "promote",
-            "demote", "transfer", "warp", "list", "disband", "chat", "help");
+            "invite", "accept", "deny", "leave", "kick", "kickoffline", "promote",
+            "demote", "transfer", "warp", "list", "disband", "chat", "mute",
+            "allinvite", "help");
 
     private final BedwarsPartyPlugin plugin;
     private final PartyManager manager;
@@ -79,6 +83,9 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
             case "remove":
                 handleKick(player, args);
                 break;
+            case "kickoffline":
+                handleKickOffline(player);
+                break;
             case "promote":
                 handlePromote(player, args);
                 break;
@@ -103,11 +110,25 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
             case "chat":
                 handleChat(player, args);
                 break;
+            case "mute":
+                handleMute(player);
+                break;
+            case "allinvite":
+                handleAllInvite(player);
+                break;
             case "reload":
                 handleReload(player);
                 break;
+            case "debug":
+                handleDebug(player);
+                break;
             default:
-                Messages.send(player, "unknown-command");
+                // Hypixel shortcut: "/p <player>" invites that player.
+                if (args.length == 1) {
+                    invitePlayer(player, args[0]);
+                } else {
+                    Messages.send(player, "unknown-command");
+                }
         }
         return true;
     }
@@ -121,9 +142,13 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
             Messages.send(player, "usage", "usage", "/party invite <player>");
             return;
         }
-        Player target = Bukkit.getPlayerExact(args[1]);
+        invitePlayer(player, args[1]);
+    }
+
+    private void invitePlayer(Player player, String targetName) {
+        Player target = Bukkit.getPlayerExact(targetName);
         if (target == null) {
-            Messages.send(player, "player-not-found", "name", args[1]);
+            Messages.send(player, "player-not-found", "name", targetName);
             return;
         }
         if (target.getUniqueId().equals(player.getUniqueId())) {
@@ -135,7 +160,7 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
         if (party == null) {
             party = manager.createParty(player.getUniqueId(), player.getName());
             Messages.send(player, "party-created");
-        } else if (!party.isLeader(player.getUniqueId()) && !party.isModerator(player.getUniqueId())) {
+        } else if (!party.canInvite(player.getUniqueId())) {
             Messages.send(player, "not-leader-or-mod");
             return;
         }
@@ -303,6 +328,24 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
         Messages.broadcast(party, "member-kicked", "name", targetName);
     }
 
+    private void handleKickOffline(Player player) {
+        Party party = manager.getParty(player.getUniqueId());
+        if (party == null) {
+            Messages.send(player, "not-in-party");
+            return;
+        }
+        if (!party.isLeader(player.getUniqueId()) && !party.isModerator(player.getUniqueId())) {
+            Messages.send(player, "not-leader-or-mod");
+            return;
+        }
+        List<String> removed = manager.kickOffline(party);
+        if (removed.isEmpty()) {
+            Messages.send(player, "kickoffline-none");
+            return;
+        }
+        Messages.broadcast(party, "kickoffline-done", "names", String.join("&f, ", removed));
+    }
+
     private void handlePromote(Player player, String[] args) {
         if (args.length < 2) {
             Messages.send(player, "usage", "usage", "/party promote <player>");
@@ -369,6 +412,10 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
             Messages.send(player, "transfer-self");
             return;
         }
+        if (party.isOffline(targetId)) {
+            Messages.send(player, "transfer-offline", "name", party.getName(targetId));
+            return;
+        }
         party.setLeader(targetId);
         Messages.broadcast(party, "leader-transferred", "name", party.getName(targetId));
         Player newLeader = Bukkit.getPlayer(targetId);
@@ -409,9 +456,12 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
             return;
         }
         player.sendMessage(Messages.get("list-header", "count", String.valueOf(party.size())));
-        player.sendMessage(Messages.get("list-leader", "name", party.getName(party.getLeader())));
+        player.sendMessage(Messages.get("list-leader", "name", displayName(party, party.getLeader())));
         player.sendMessage(Messages.get("list-moderators", "names", joinNames(party, party.getModerators())));
         player.sendMessage(Messages.get("list-members", "names", joinNames(party, party.getRegularMembers())));
+        if (party.hasOfflineMembers()) {
+            player.sendMessage(Messages.get("list-offline-hint"));
+        }
         player.sendMessage(Messages.get("list-footer"));
     }
 
@@ -438,6 +488,31 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
         }
     }
 
+    private void handleMute(Player player) {
+        Party party = manager.getParty(player.getUniqueId());
+        if (party == null) {
+            Messages.send(player, "not-in-party");
+            return;
+        }
+        if (!party.isLeader(player.getUniqueId()) && !party.isModerator(player.getUniqueId())) {
+            Messages.send(player, "not-leader-or-mod");
+            return;
+        }
+        boolean muted = !party.isMuted();
+        party.setMuted(muted);
+        Messages.broadcast(party, muted ? "mute-enabled" : "mute-disabled");
+    }
+
+    private void handleAllInvite(Player player) {
+        Party party = requireLeader(player);
+        if (party == null) {
+            return;
+        }
+        boolean allInvite = !party.isAllInvite();
+        party.setAllInvite(allInvite);
+        Messages.broadcast(party, allInvite ? "allinvite-enabled" : "allinvite-disabled");
+    }
+
     private void handleReload(Player player) {
         if (!player.hasPermission("bedwarsparty.admin")) {
             Messages.send(player, "no-permission");
@@ -446,6 +521,16 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
         plugin.reloadConfig();
         Messages.load(plugin);
         Messages.send(player, "reloaded");
+    }
+
+    private void handleDebug(Player player) {
+        if (!player.hasPermission("bedwarsparty.admin")) {
+            Messages.send(player, "no-permission");
+            return;
+        }
+        for (String line : plugin.buildHookDiagnostics()) {
+            player.sendMessage(Messages.color(line));
+        }
     }
 
     // ------------------------------------------------------------------
@@ -501,6 +586,12 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
         return null;
     }
 
+    /** Appends the offline marker so {@code /party list} shows who is gone. */
+    private String displayName(Party party, UUID uuid) {
+        String name = party.getName(uuid);
+        return party.isOffline(uuid) ? name + Messages.get("list-offline-suffix") : name;
+    }
+
     private String joinNames(Party party, List<UUID> ids) {
         if (ids.isEmpty()) {
             return Messages.get("list-none");
@@ -510,7 +601,7 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
             if (i > 0) {
                 sb.append("&f, ");
             }
-            sb.append(party.getName(ids.get(i)));
+            sb.append(displayName(party, ids.get(i)));
         }
         return sb.toString();
     }
@@ -527,7 +618,10 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
         Player player = (Player) sender;
 
         if (args.length == 1) {
-            return filter(SUBCOMMANDS, args[0]);
+            // "/p <player>" is a valid invite, so offer players next to the subcommands.
+            List<String> options = new ArrayList<>(SUBCOMMANDS);
+            options.addAll(onlinePlayerNames(player));
+            return filter(options, args[0]);
         }
         if (args.length == 2) {
             switch (args[0].toLowerCase(Locale.ROOT)) {

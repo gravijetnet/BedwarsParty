@@ -58,8 +58,6 @@ denied-notify: "%prefix%&c%name% &fdenied your party invite."
 left-party: "%prefix%&fYou left the party."
 # %name%
 member-left: "%prefix%&c%name% &fleft the party."
-# %name%
-member-disconnected: "%prefix%&c%name% &fdisconnected and left the party."
 kicked: "%prefix%&fYou have been removed from the party."
 # %name%
 member-kicked: "%prefix%&c%name% &fwas removed from the party."
@@ -71,6 +69,23 @@ disbanded: "%prefix%&fThe party has been disbanded."
 # %name%  (broadcast, name = new leader)
 leader-transferred: "%prefix%&fLeadership has been transferred to &c%name%&f."
 new-leader-you: "%prefix%&fYou are now the party leader."
+
+# ---- Disconnect / Reconnect ----
+# %name% %minutes%  (broadcast when a member disconnects)
+member-disconnected: "%prefix%&c%name% &fdisconnected. They have &c%minutes% minutes &fto reconnect before they are removed."
+# %name%  (broadcast when they made it back in time)
+member-reconnected: "%prefix%&c%name% &freconnected and is back in the party."
+# %name%  (shown to the player that reconnected, name = leader)
+rejoined-party: "%prefix%&fWelcome back! You are still in &c%name%&f's party."
+# %name%  (broadcast when the grace period ran out)
+member-offline-removed: "%prefix%&c%name% &fwas removed from the party after being offline for too long."
+# %names%
+kickoffline-done: "%prefix%&fRemoved all offline members: &c%names%&f."
+kickoffline-none: "%prefix%&fThere are no offline members in your party."
+# %name%
+transfer-offline: "%prefix%&c%name% &fis offline. You cannot hand the party to them."
+# %names%  (hint shown by MBedwars when the join is blocked)
+arena-join-blocked: "%prefix%&fYou cannot join while your party has offline members: &c%names%&f. Use &c/party kickoffline &for wait for them."
 
 # ---- Promote / Demote / Transfer ----
 # %name%
@@ -99,11 +114,18 @@ list-moderators: "&cModerators &8» &f%names%"
 # %names%
 list-members: "&cMembers &8» &f%names%"
 list-none: "&7None"
+list-offline-suffix: " &8(offline)"
+list-offline-hint: "&7Offline members block your party from joining a game."
 list-footer: "&8&m-------------------------------------------------"
 
 # ---- Party Chat ----
 chat-enabled: "%prefix%&fParty chat &cenabled&f. Your messages now go to your party."
 chat-disabled: "%prefix%&fParty chat &cdisabled&f."
+chat-muted: "%prefix%&fThe party chat is muted. Only the leader and moderators can talk."
+mute-enabled: "%prefix%&fThe party chat is now &cmuted&f."
+mute-disabled: "%prefix%&fThe party chat is no longer muted."
+allinvite-enabled: "%prefix%&fEvery member can now invite players to the party."
+allinvite-disabled: "%prefix%&fOnly the leader and moderators can invite players now."
 
 # ---- Admin ----
 reloaded: "%prefix%&fConfiguration reloaded."
@@ -111,16 +133,19 @@ reloaded: "%prefix%&fConfiguration reloaded."
 # ---- Help (list of lines) ----
 help:
   - "&8&m--------------&r &cParty Commands &8&m--------------"
-  - "&c/party invite <player> &8» &fInvite a player to your party"
+  - "&c/party <player> &8» &fInvite a player to your party"
   - "&c/party accept <player> &8» &fAccept a party invite"
   - "&c/party deny <player> &8» &fDeny a party invite"
   - "&c/party leave &8» &fLeave your current party"
   - "&c/party kick <player> &8» &fRemove a member from the party"
+  - "&c/party kickoffline &8» &fRemove all offline members"
   - "&c/party promote <player> &8» &fPromote a member to moderator"
   - "&c/party demote <player> &8» &fDemote a moderator"
   - "&c/party transfer <player> &8» &fTransfer the leadership"
   - "&c/party warp &8» &fTeleport your party to you"
   - "&c/party list &8» &fShow all party members"
+  - "&c/party mute &8» &fMute the party chat"
+  - "&c/party allinvite &8» &fLet every member invite players"
   - "&c/party disband &8» &fDisband your party"
   - "&c/partychat [message] &8» &fParty chat, or toggle it"
   - "&8&m-------------------------------------------------"
