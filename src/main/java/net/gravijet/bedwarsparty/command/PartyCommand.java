@@ -186,7 +186,10 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
         manager.invite(party, player.getUniqueId(), player.getName(), target.getUniqueId(), target.getName());
         int seconds = (int) (manager.getInviteExpiryMillis() / 1000L);
         Messages.send(player, "invite-sent", "name", target.getName());
-        Messages.send(target, "invite-received", "inviter", player.getName(), "seconds", String.valueOf(seconds));
+        // Clicking the invite accepts it; "accept <inviter>" also picks the right
+        // party when the target is sitting on several invites at once.
+        Messages.sendClickable(target, "invite-received", "/party accept " + player.getName(),
+                "invite-received-hover", "inviter", player.getName(), "seconds", String.valueOf(seconds));
     }
 
     private void handleAccept(Player player, String[] args) {

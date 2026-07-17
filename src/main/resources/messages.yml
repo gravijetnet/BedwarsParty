@@ -24,8 +24,10 @@ usage: "%prefix%&fUsage: &c%usage%"
 party-created: "%prefix%&fYou created a new party."
 # %name%
 invite-sent: "%prefix%&fYou invited &c%name% &fto your party."
-# %inviter% %seconds%
-invite-received: "%prefix%&c%inviter% &fhas invited you to their party. Type &c/party accept %inviter% &fwithin &c%seconds%s&f to join."
+# %inviter% %seconds%  (the whole message is clickable and accepts the invite)
+invite-received: "%prefix%&c%inviter% &fhas invited you to their party. Click this message or type &c/party accept %inviter% &fwithin &c%seconds%s&f to join."
+# %inviter% %seconds%  (tooltip shown when hovering the invite; empty = no tooltip)
+invite-received-hover: "&fClick to join &c%inviter%&f's party."
 # %name%
 invite-already-sent: "%prefix%&c%name% &falready has a pending invite."
 # %name%

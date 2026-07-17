@@ -1,6 +1,9 @@
 package net.gravijet.bedwarsparty.util;
 
 import net.gravijet.bedwarsparty.party.Party;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -78,6 +81,34 @@ public final class Messages {
     private static void sendRaw(CommandSender to, String message) {
         for (String line : message.split("\n", -1)) {
             to.sendMessage(line);
+        }
+    }
+
+    /**
+     * Sends a message that runs {@code command} when the player clicks it, with
+     * the text of {@code hoverKey} as the tooltip. An empty tooltip is omitted.
+     *
+     * <p>Every line of the message carries the click, so the player can hit any
+     * part of it.</p>
+     */
+    public static void sendClickable(Player to, String key, String command, String hoverKey, String... replacements) {
+        ClickEvent click = new ClickEvent(ClickEvent.Action.RUN_COMMAND, command);
+
+        HoverEvent hover = null;
+        if (hoverKey != null) {
+            String tooltip = get(hoverKey, replacements);
+            if (!tooltip.isEmpty()) {
+                hover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(tooltip));
+            }
+        }
+
+        for (String line : get(key, replacements).split("\n", -1)) {
+            TextComponent component = new TextComponent(TextComponent.fromLegacyText(line));
+            component.setClickEvent(click);
+            if (hover != null) {
+                component.setHoverEvent(hover);
+            }
+            to.spigot().sendMessage(component);
         }
     }
 

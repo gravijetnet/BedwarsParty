@@ -46,9 +46,8 @@
             <!--
                 spigot-api 1.8.8 pulls in net.md-5:bungeecord-chat:1.8-SNAPSHOT
                 transitively. That old snapshot has been purged from the Spigot
-                and Sonatype repos, so it no longer resolves in CI. The plugin
-                does not use any net.md_5.bungee.* chat-component classes, and the
-                server provides them at runtime anyway, so we exclude it.
+                and Sonatype repos, so it no longer resolves in CI. We exclude it
+                and pin an immutable release below instead.
             -->
             <exclusions>
                 <exclusion>
@@ -56,6 +55,25 @@
                     <artifactId>bungeecord-chat</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!--
+            Chat components, used for the clickable party invite. Stands in for the
+            purged 1.8-SNAPSHOT excluded above; this is a Maven Central release, so
+            it always resolves in CI.
+
+            Compile-time only: the 1.8.8 server ships its own (1.8) copy of these
+            classes and that is what the plugin links against at runtime. Stick to
+            the subset that already existed in 1.8 - TextComponent(String),
+            TextComponent(BaseComponent...), TextComponent.fromLegacyText(String),
+            ClickEvent(Action, String), HoverEvent(Action, BaseComponent[]) and the
+            BaseComponent setters - or the server throws NoSuchMethodError.
+        -->
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-chat</artifactId>
+            <version>1.16-R0.4</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- MBedwars API. Provided at runtime by the MBedwars plugin. -->
